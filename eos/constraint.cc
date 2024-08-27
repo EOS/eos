@@ -72,6 +72,13 @@ namespace eos
     };
     template class WrappedForwardIterator<ConstraintEntry::ObservableNameIteratorTag, const QualifiedName>;
 
+    template <>
+    struct WrappedForwardIteratorTraits<ConstraintEntry::ReferenceNameIteratorTag>
+    {
+        using UnderlyingIterator = std::vector<ReferenceName>::const_iterator;
+    };
+    template class WrappedForwardIterator<ConstraintEntry::ReferenceNameIteratorTag, const ReferenceName>;
+
     namespace impl
     {
         static bool less(const std::pair<YAML::Node, YAML::Node> & lhs, const std::pair<YAML::Node, YAML::Node> & rhs)
@@ -89,31 +96,37 @@ namespace eos
 
             std::vector<QualifiedName> _observable_names;
 
+            std::vector<ReferenceName> _reference_names;
+
             ConstraintEntryBase(const QualifiedName & name,
-                    std::vector<QualifiedName> && observable_names) :
+                    std::vector<QualifiedName> && observable_names,
+                    std::vector<ReferenceName> && reference_names) :
                 _name(name),
-                _observable_names(std::move(observable_names))
+                _observable_names(std::move(observable_names)),
+                _reference_names(std::move(reference_names))
             {
             }
 
         public:
             ConstraintEntryBase(const QualifiedName & name,
                     const QualifiedName & observable_name) :
-                ConstraintEntryBase(name, std::vector<QualifiedName>{ observable_name })
+                ConstraintEntryBase(name, std::vector<QualifiedName>{ observable_name }, std::vector<ReferenceName>())
             {
             }
 
             ConstraintEntryBase(const QualifiedName & name,
-                    const std::vector<QualifiedName> & observable_names) :
+                    const std::vector<QualifiedName> & observable_names,
+                    const std::vector<ReferenceName> & reference_names) :
                 _name(name),
-                _observable_names(observable_names)
+                _observable_names(observable_names),
+                _reference_names(reference_names)
             {
             }
 
             template <unsigned long n_>
             ConstraintEntryBase(const QualifiedName & name,
                     const std::array<QualifiedName, n_> & observable_names) :
-                ConstraintEntryBase(name, std::vector<QualifiedName>(observable_names.begin(), observable_names.end()))
+                ConstraintEntryBase(name, std::vector<QualifiedName>(observable_names.begin(), observable_names.end()), std::vector<ReferenceName>())
             {
             }
 
@@ -129,6 +142,16 @@ namespace eos
             virtual ConstraintEntry::ObservableNameIterator end_observable_names() const
             {
                 return _observable_names.end();
+            }
+
+            virtual ConstraintEntry::ReferenceNameIterator begin_references() const final
+            {
+                return _reference_names.begin();
+            }
+
+            virtual ConstraintEntry::ReferenceNameIterator end_references() const final
+            {
+                return _reference_names.end();
             }
 
             virtual void serialize(YAML::Emitter & out) const
@@ -781,7 +804,7 @@ namespace eos
                 const std::vector<double> & sigma_sys,
                 const std::vector<std::vector<double>> & correlation,
                 const unsigned number_of_observations) :
-            ConstraintEntryBase(name, observable_names),
+            ConstraintEntryBase(name, observable_names, std::vector<ReferenceName>()),
             observable_names(observable_names),
             kinematics(kinematics),
             options(options),
@@ -1198,8 +1221,9 @@ namespace eos
                 gsl_vector * const means,
                 gsl_matrix * const covariance,
                 gsl_matrix * const response,
+                const std::vector<ReferenceName> & references,
                 const unsigned number_of_observations) :
-            ConstraintEntryBase(name, observables),
+            ConstraintEntryBase(name, observables, references),
             observables(observables),
             kinematics(kinematics),
             options(options),
@@ -1408,6 +1432,12 @@ namespace eos
                 out << YAML::EndSeq;
             }
             out << YAML::EndSeq;
+            out << YAML::Key << "references" << YAML::Value << YAML::BeginSeq << YAML::Flow;
+            for (auto rn: this->_reference_names)
+            {
+                out << rn.str();
+            }
+            out << YAML::EndSeq;
             if (response)
             {
                 out << YAML::Key << "response" << YAML::Value << YAML::BeginSeq;
@@ -1594,7 +1624,21 @@ namespace eos
                     }
                 }
 
-                return new MultivariateGaussianCovarianceConstraintEntry(name.str(), observables, kinematics, options, means, covariance, response, dof);
+                std::vector<ReferenceName> reference_names;
+                if (n["references"].IsDefined())
+                {
+                    if (YAML::NodeType::Sequence != n["references"].Type())
+                    {
+                        throw ConstraintDeserializationError(name, "references key not mapped to a sequence");
+                    }
+
+                    for (auto && rn : n["references"])
+                    {
+                        reference_names.push_back(ReferenceName(rn.as<std::string>()));
+                    }
+                }
+
+                return new MultivariateGaussianCovarianceConstraintEntry(name.str(), observables, kinematics, options, means, covariance, response, reference_names, dof);
             }
             catch (QualifiedNameSyntaxError & e)
             {
@@ -1625,7 +1669,7 @@ namespace eos
                 const std::vector<Options> & options,
                 const double & bound,
                 const double & uncertainty) :
-            ConstraintEntryBase(name, observable_names),
+            ConstraintEntryBase(name, observable_names, std::vector<ReferenceName>()),
             observable_names(observable_names),
             kinematics(kinematics),
             options(options),
@@ -1869,7 +1913,7 @@ namespace eos
                 const std::vector<double> & weights,
                 const std::vector<std::array<double, 2>> & test_stat,
                 const unsigned number_of_observations) :
-            ConstraintEntryBase(name, observables),
+            ConstraintEntryBase(name, observables, std::vector<ReferenceName>()),
             observables(observables),
             kinematics(kinematics),
             options(options),
