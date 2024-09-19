@@ -22,6 +22,7 @@ libeosrarebdecays_la_SOURCES = \
 	b-to-kstar-ll-gp2004.cc b-to-kstar-ll-gp2004.hh \
 	b-to-kstar-ll-gvdv2020.cc b-to-kstar-ll-gvdv2020.hh \
 	b-to-ll.cc b-to-ll.hh \
+	b-to-nu-nu.cc b-to-nu-nu.hh \
 	b-to-psd-nu-nu.cc b-to-psd-nu-nu.hh \
 	b-to-vec-nu-nu.cc b-to-vec-nu-nu.hh \
 	bremsstrahlung.cc bremsstrahlung.hh \
@@ -92,6 +93,7 @@ TESTS = \
 	b-to-kstar-ll-gvdv2020_TEST \
 	b-to-kstar-nu-nu_TEST \
 	b-to-ll_TEST \
+	b-to-nu-nu_TEST \
 	bs-to-phi-charmonium_TEST \
 	bs-to-phi-ll-bfs2004_TEST \
 	bs-to-phi-ll-gvdv2020_TEST \
@@ -137,6 +139,8 @@ b_to_kstar_ll_gvdv2020_TEST_SOURCES = b-to-kstar-ll-gvdv2020_TEST.cc
 b_to_kstar_nu_nu_TEST_SOURCES = b-to-kstar-nu-nu_TEST.cc
 
 b_to_ll_TEST_SOURCES = b-to-ll_TEST.cc
+
+b_to_nu_nu_TEST_SOURCES = b-to-nu-nu_TEST.cc
 
 bs_to_phi_charmonium_TEST_SOURCES = bs-to-phi-charmonium_TEST.cc
 
