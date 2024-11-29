@@ -251,6 +251,7 @@ class StepComponent(Deserializable):
 #   priors (mandatory)
 #   likelihoods (mandatory)
 #   posteriors (mandatory)
+#   constraints (optional)
 #   observables (optional)
 #   predictions (optional)
 #   parameters (optional)
@@ -288,6 +289,10 @@ class StepComponent(Deserializable):
 #  likelihood (mandatory): list of strings (corresponding to likelihood names)
 #  global_options (optional): dict
 #  fixed_parameters (optional): dict
+
+
+# constraints schema:
+# dict, where each key is a new constraint's qualified name and the corresponding value is a dict that can be parsed by Constraints.insert
 
 
 # observables schema:

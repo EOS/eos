@@ -24,7 +24,7 @@ import yaml
 from dataclasses import asdict
 from eos.analysis_file_description import PriorComponent, LikelihoodComponent, PosteriorDescription, \
                                        PredictionDescription, ObservableComponent, ParameterComponent, \
-                                       StepComponent, PriorDescription
+                                       StepComponent, PriorDescription, ConstraintPriorDescription, ManualConstraintDescription
 
 class AnalysisFile:
     """Represents a collection of statistical analyses and their building blocks.
@@ -87,6 +87,7 @@ class AnalysisFile:
                 eos.info(f'Inserted observable: { o.name }')
             eos.completed(f'... finished inserting {len(self._obs)} custom observables')
 
+        # Optional: declare custom parameters
         if 'parameters' not in self.input_data:
             self._params = []
         else:
@@ -101,10 +102,27 @@ class AnalysisFile:
                         for aliased_qn in p.alias_of:
                             eos.Parameters.redirect(eos.QualifiedName(aliased_qn), id)
                             eos.info(f'Created parameter alias: {aliased_qn} -> {qn}')
-                except eos.Exception as e:
+                except RuntimeError as e:
                     raise ValueError(f'Unexpected value encountered in description of parameter \'{p.name}\': {e}')
             eos.completed(f'... finished declaring {len(self._params)} custom parameters')
 
+        # Optional: define globally-available custom constraints
+        if 'constraints' not in self.input_data:
+            self._constraints = []
+        else:
+            eos.inprogress('Declaring custom constraints ...')
+            self._constraints = [ManualConstraintDescription.from_dict(name=n, info=d) for n, d in self.input_data["constraints"].items()]
+            constraints = eos.Constraints()
+            for c in self._constraints:
+                try:
+                    description = yaml.dump(c.info)
+                    constraints.insert(c.name, description)
+                    eos.info(f'Declared constraint: {c.name}')
+                except RuntimeError as e:
+                    raise ValueError(f'Unexpected value encountered in description of constraint \'{c.name}\': {e}')
+            eos.completed(f'... finished declaring {len(self._constraints)} custom constraints')
+
+        # Optional: define analysis steps
         if 'steps' not in self.input_data:
             self._steps = []
         else:
@@ -384,14 +402,17 @@ class AnalysisFile:
         messages = []
         # Check that all priors are known to EOS
         known_params = eos.Parameters()
+        known_constraints = eos.Constraints()
         for p_name, pc in self._priors.items():
             for description in pc.descriptions:
                 try:
-                    known_params[description.parameter]
+                    if isinstance(description, ConstraintPriorDescription):
+                        known_constraints[description.constraint]
+                    else:
+                        known_params[description.parameter]
                 except RuntimeError:
                     messages.append(f"Error in prior {p_name}: Parameter '{description.parameter}' not known to EOS")
         # Check that all likelihoods contain valid constraints and manual constraints
-        known_constraints = eos.Constraints()
         for l_name, lc in self._likelihoods.items():
             for description in lc.constraints:
                 try:
