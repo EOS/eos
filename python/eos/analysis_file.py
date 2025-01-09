@@ -25,7 +25,7 @@ import inspect
 from dataclasses import asdict
 from eos.analysis_file_description import PriorComponent, LikelihoodComponent, PosteriorDescription, \
                                        PredictionDescription, ObservableComponent, ParameterComponent, \
-                                       StepComponent, PriorDescription
+                                       StepComponent, PriorDescription, MaskComponent, MaskExpressionComponent
 
 class AnalysisFile:
     """Represents a collection of statistical analyses and their building blocks.
@@ -112,6 +112,21 @@ class AnalysisFile:
             if len(self.input_data['steps']) != len({s['id'] for s in self.input_data['steps']}):
                 raise ValueError("All steps must have a unique id")
             self._steps = { s["id"]: StepComponent.from_dict(**s) for s in self.input_data['steps'] }
+
+        if 'masks' not in self.input_data:
+            self._masks = {}
+        else:
+            if len(self.input_data['masks']) != len({m['name'] for m in self.input_data['masks']}):
+                raise ValueError("All masks must have a unique name")
+            self._masks = { m["name"]: MaskComponent.from_dict(**m) for m in self.input_data['masks'] }
+            # Insert custom observables using the expression parser
+            eos.inprogress('Inserting custom observables for sample masks ...')
+            for mc in self._masks.values():
+                for d in mc.description:
+                    if isinstance(d, MaskExpressionComponent):
+                        eos.Observables().insert(d.name, "", eos.Unit("1"), eos.Options(), d.expression)
+                        eos.info(f'Inserted observable: {d.name}')
+
 
     def analysis(self, _posterior):
         """Create an eos.Analysis object for the named posterior."""
@@ -295,6 +310,8 @@ class AnalysisFile:
                 known_arguments = set(inspect.signature(task_func).parameters.keys())
                 for arg in provided_arguments - known_arguments:
                     raise messages.append(f'Task \'{tc.task}\' does not recognize argument \'{arg}\'')
+        # Check that any expression observables defined in masks have unique names
+
         # Check all the posteriors can be initialised, and used for the predictions specified in the analysis file
         # This will (hopefully) act as a catch all for any errors not spotted above
         for posterior in self._posteriors:
