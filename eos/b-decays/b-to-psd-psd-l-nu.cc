@@ -84,7 +84,7 @@ namespace eos
 
         int int_points;
 
-        std::shared_ptr<FormFactors<PToPP2>> form_factors;
+        std::shared_ptr<FormFactors<PToPP>> form_factors;
 
         std::shared_ptr<ScatteringAmplitudes<PPToPP>> scattering_amplitudes;
 
@@ -254,7 +254,7 @@ namespace eos
             mu(p[opt_U.str() + "b" + opt_l.str() + "nu" + opt_l.str() + "::mu"], u),
             opt_int_points(o, "integration-points", {"256", "512", "1024", "2048", "4096", "8192", "16384"}, "4096"),
             int_points(destringify<int>(opt_int_points.value())),
-            form_factors(FormFactorFactory<PToPP2>::create(_process() + "::" + o.get("form-factors", "HKvT2025"), p, o)),
+            form_factors(FormFactorFactory<PToPP>::create(_process() + "::" + o.get("form-factors", "HKvT2025"), p, o)),
             scattering_amplitudes(ScatteringAmplitudeFactory<PPToPP>::create(_scattering_amps() + "::" + o.get("scattering-amplitudes", "HKvT2025"), p, o))
         {
             Context ctx("When constructing B->PPlnu observable");
@@ -282,7 +282,7 @@ namespace eos
     Implementation<BToPPLeptonNeutrino>::options
     {
         Model::option_specification(),
-        FormFactorFactory<PToPP2>::option_specification(),
+        FormFactorFactory<PToPP>::option_specification(),
         { "cp-conjugate", { "true", "false" },  "false" },
         { "l",            { "e", "mu", "tau" }, "mu"    },
         { "U",            { "c", "u" },         "c"     },
