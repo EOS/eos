@@ -37,6 +37,9 @@ namespace eos
         public FormFactors<VacuumToPP>
     {
         private:
+            SpecifiedOption n_resonances_1m;
+            SpecifiedOption n_resonances_0p;
+
             // parameters for form factor f_+
             std::array<UsedParameter, 9u> _b_fp;
             std::array<UsedParameter, 2u> _M_fp;
@@ -108,6 +111,7 @@ namespace eos
             complex<double> phitilde_p(const complex<double> & z, const double & chi_1m) const;
             complex<double> phitildeprime_p(const complex<double> & z, const double & chi_1m) const;
             complex<double> resonance_product_p(const complex<double> & z) const;
+            complex<double> resonance_productprime_p(const complex<double> & z) const;
 
             /* functions pertaining to f_z */
             complex<double> w_z(const complex<double> & z) const;
@@ -133,6 +137,7 @@ namespace eos
 
             static std::vector<OptionSpecification>::const_iterator begin_options();
             static std::vector<OptionSpecification>::const_iterator end_options();
+            static const std::vector<OptionSpecification> options;
             static const std::vector<OptionSpecification> option_specifications;
 
             static const std::set<ReferenceName> references;

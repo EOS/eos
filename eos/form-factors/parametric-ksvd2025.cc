@@ -32,7 +32,7 @@
 namespace eos
 {
     /* Vacuum -> pi pi */
-    KSvD2025FormFactors<VacuumToKPi>::KSvD2025FormFactors(const Parameters & p, const Options & /*o*/) :
+    KSvD2025FormFactors<VacuumToKPi>::KSvD2025FormFactors(const Parameters & p, const Options & o) :
         _b_fp{{
             UsedParameter(p[_coeff_name("+", "1")], *this),
             UsedParameter(p[_coeff_name("+", "2")], *this),
@@ -74,7 +74,9 @@ namespace eos
         _m_K(p["mass::K_d"], *this),
         _m_pi(p["mass::pi^-"], *this),
         _t_0(p["0->Kpi::t_0@KSvD2025"], *this),
-        _hbar(p["QM::hbar"], *this)
+        _hbar(p["QM::hbar"], *this),
+        n_resonances_1m(o, options, "n-resonances-1m"),
+        n_resonances_0p(o, options, "n-resonances-0p")
     {
     }
 
@@ -154,9 +156,49 @@ namespace eos
     complex<double>
     KSvD2025FormFactors<VacuumToKPi>::resonance_product_p(const complex<double> & z) const
     {
-        // Product of the resonance factors for f+
-        // TODO
-        return 1.0;
+        const std::size_t num_resonances = stoi(n_resonances_1m.value());
+
+        std::vector<double> M(num_resonances);
+        std::copy(_M_fp.cbegin(), _M_fp.cend(), M.begin());
+        std::vector<double> Gamma(num_resonances);
+        std::copy(_G_fp.cbegin(), _G_fp.cend(), Gamma.begin());
+
+        std::vector<complex<double>> f(num_resonances); // such that Pi = prod_r f[r]
+        complex<double> zr;
+        for (auto i = 0u; i < num_resonances; i++)
+        {
+            zr = this->_zr(M[i], Gamma[i]);
+            f[i] = 1.0 / (z - zr) / (z - std::conj(zr));
+        }
+        return std::accumulate(f.cbegin(), f.cend(), complex<double>(1.0), std::multiplies<complex<double>>());
+    }
+
+    complex<double>
+    KSvD2025FormFactors<VacuumToKPi>::resonance_productprime_p(const complex<double> & z) const
+    {
+        const std::size_t num_resonances = stoi(n_resonances_1m.value());
+
+        std::vector<double> M(num_resonances);
+        std::copy(_M_fp.cbegin(), _M_fp.cend(), M.begin());
+        std::vector<double> Gamma(num_resonances);
+        std::copy(_G_fp.cbegin(), _G_fp.cend(), Gamma.begin());
+
+        std::vector<complex<double>> f(num_resonances); // such that Pi = prod_r f[r]
+        complex<double> zr;
+        for (auto i = 0u; i < num_resonances; i++)
+        {
+            zr = this->_zr(M[i], Gamma[i]);
+            f[i] = 1.0 / (z - zr) / (z - std::conj(zr));
+        }
+        const auto prod_f = std::accumulate(f.cbegin(), f.cend(), complex<double>(1.0), std::multiplies<complex<double>>());
+
+        std::vector<complex<double>> fprime(num_resonances); // such that Pi' = prod_r fprime[r]
+        for (auto i = 0u; i < num_resonances; i++)
+        {
+            zr = this->_zr(M[i], Gamma[i]);
+            fprime[i] =  (-2.0 * (z - zr.real()) / power_of<2>(z - zr) / power_of<2>(z - std::conj(zr)) ) * prod_f / f[i];
+        }
+        return std::accumulate(fprime.cbegin(), fprime.cend(), complex<double>(0.0));
     }
 
     complex<double>
@@ -257,27 +299,46 @@ namespace eos
     complex<double>
     KSvD2025FormFactors<VacuumToKPi>::resonance_product_z(const complex<double> & z) const
     {
-        // Product of the resonance factors for f0
-        // TODO
-        return 1.0;
+        const std::size_t num_resonances = stoi(n_resonances_0p.value());
+
+        std::vector<double> M(num_resonances);
+        std::copy(_M_fz.cbegin(), _M_fz.cend(), M.begin());
+        std::vector<double> Gamma(num_resonances);
+        std::copy(_G_fz.cbegin(), _G_fz.cend(), Gamma.begin());
+
+        std::vector<complex<double>> f(num_resonances); // such that Pi = prod_r f[r]
+        complex<double> zr;
+        for (auto i = 0u; i < num_resonances; i++)
+        {
+            zr = this->_zr(M[i], Gamma[i]);
+            f[i] = 1.0 / (z - zr) / (z - std::conj(zr));
+        }
+        return std::accumulate(f.cbegin(), f.cend(), complex<double>(1.0), std::multiplies<complex<double>>());
     }
 
     double
     KSvD2025FormFactors<VacuumToKPi>::_b0_fp(const double & chi_1m) const
     {
         // determine the coefficient b^+_0 of f_+(q^2) by imposing that Im f_+(q^2) ~ sqrt(q^2 - t_+)^3
-        const complex<double> zm1 = this->z(-1.0);
+        const complex<double> phitilde_m1 = this->phitilde_p(-1.0, chi_1m);
+        const complex<double> phitildeprime_m1 = this->phitildeprime_p(-1.0, chi_1m);
 
-        const complex<double> phitilde_m1 = this->phitilde_p(zm1, chi_1m);
-        const complex<double> phitildeprime_m1 = this->phitildeprime_p(zm1, chi_1m);
-
-        const complex<double> resonance_productprime = this->resonance_productprime_p(zm1);
+        const complex<double> resonance_productprime = this->resonance_productprime_p(-1.0);
 
         const complex<double> X = phitilde_m1;
         const complex<double> Xprime = -1.0*phitildeprime_m1 / power_of<2>(phitilde_m1) + resonance_productprime / phitilde_m1;
 
-        const double b0 = -1.0 / Xprime * ();
+        std::array<double, 9> bp;
+        std::copy(_b_fp.cbegin(), _b_fp.cend(), bp.begin());
 
+        std::array<complex<double>, bp.size()> c;
+        for (auto n = 0u; n < c.size(); n++)
+        {
+            c[n] = pow(-1, n) * (-1.0*n * X + Xprime);
+        }
+        // Is there a way to write this in manifestly real form?
+        const double b0 = std::real( -1.0 / Xprime
+                                     * std::inner_product(bp.cbegin(), bp.cend(), c.cbegin(), complex<double>(0.0, 0.0)));
         return b0;
     }
 
@@ -304,7 +365,7 @@ namespace eos
         const auto phitilde_p_z0 = this->phitilde_p(z0, chi_1m);
         const auto phitilde_z_z0 = this->phitilde_z(z0, chi_0p);
 
-
+        // Is there a way to write this in manifestly real form?
         const double b0 = std::real( (phitilde_z_z0 / phitilde_p_z0) * (Pi_p / Pi_z) * bp_sum - b0_sum );
         return b0;
     }
@@ -439,6 +500,8 @@ namespace eos
     const std::vector<OptionSpecification>
     KSvD2025FormFactors<VacuumToKPi>::option_specifications
     {
+        { "n-resonances-1m", { "1", "2", "3" }, "2" },
+        { "n-resonances-0p", { "1", "2"      }, "2" }
     };
 
     std::vector<OptionSpecification>::const_iterator
