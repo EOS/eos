@@ -119,6 +119,7 @@ TESTS = \
 	parametric-dm2016_TEST \
 	parametric-fvdv2018_TEST \
 	parametric-kkrvd2024_TEST \
+	parametric-ksvd2025_TEST \
 	parametric-kkvdz2022_TEST \
 	parametric-kmpw2010_TEST \
 	pi-lcdas_TEST \
@@ -192,6 +193,8 @@ parametric_dm2016_TEST_SOURCES = parametric-dm2016_TEST.cc
 parametric_fvdv2018_TEST_SOURCES = parametric-fvdv2018_TEST.cc
 
 parametric_kkrvd2024_TEST_SOURCES = parametric-kkrvd2024_TEST.cc
+
+parametric_ksvd2025_TEST_SOURCES = parametric-ksvd2025_TEST.cc
 
 parametric_kkvdz2022_TEST_SOURCES = parametric-kkvdz2022_TEST.cc
 

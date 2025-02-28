@@ -38,9 +38,14 @@ namespace eos
     {
         private:
             // parameters for form factor f_+
-            std::array<UsedParameter, 8u> _b_fp;
+            std::array<UsedParameter, 9u> _b_fp;
             std::array<UsedParameter, 2u> _M_fp;
             std::array<UsedParameter, 2u> _G_fp;
+
+            // parameters for form factor f_0
+            std::array<UsedParameter, 9u> _b_fz;
+            std::array<UsedParameter, 2u> _M_fz;
+            std::array<UsedParameter, 2u> _G_fz;
 
             // hadron masses
             UsedParameter _m_K;
@@ -63,7 +68,12 @@ namespace eos
 
             inline double _t_p() const
             {
-                return power_of<2>(_m_pi() + _m_K());
+                return power_of<2>(_m_K() + _m_pi());
+            }
+
+            inline double _t_m() const
+            {
+                return power_of<2>(_m_K() - _m_pi());
             }
 
             inline complex<double> _z(const complex<double> & q2, const double & t_0) const
@@ -78,8 +88,8 @@ namespace eos
                 return 1.0 / _z(power_of<2>(complex<double>(M, -Gamma/2)), _t_0());
             }
 
-            double _b0_fp(const double & chi_p) const;
-            double _b0_fz(const double & chi_p, const double & chi_z) const;
+            double _b0_fp(const double & chi_1m) const;
+            double _b0_fz(const double & chi_1m, const double & chi_0p) const;
 
         public:
             KSvD2025FormFactors(const Parameters & p, const Options & o);
@@ -95,13 +105,15 @@ namespace eos
 
             /* functions pertaining to f_p */
             complex<double> w_p(const complex<double> & z) const;
-            complex<double> phitilde_p(const complex<double> & z, const double & chi) const;
-            complex<double> phitildeprime_p(const complex<double> & z, const double & chi) const;
+            complex<double> phitilde_p(const complex<double> & z, const double & chi_1m) const;
+            complex<double> phitildeprime_p(const complex<double> & z, const double & chi_1m) const;
+            complex<double> resonance_product_p(const complex<double> & z) const;
 
             /* functions pertaining to f_z */
             complex<double> w_z(const complex<double> & z) const;
-            complex<double> phitilde_z(const complex<double> & z, const double & chi) const;
-            complex<double> phitildeprime_z(const complex<double> & z, const double & chi) const;
+            complex<double> phitilde_z(const complex<double> & z, const double & chi_0p) const;
+            complex<double> phitildeprime_z(const complex<double> & z, const double & chi_0p) const;
+            complex<double> resonance_product_z(const complex<double> & z) const;
 
             /* form factors on the real axis */
             virtual complex<double> f_p(const double & q2) const override;
@@ -114,8 +126,10 @@ namespace eos
             virtual complex<double> f_t(const complex<double> & q2) const override;
 
             /* saturation of the dispersive bound */
-            double dispersive_integrand(const double & alpha) const;
-            double saturation() const;
+            double dispersive_integrand_p(const double & alpha) const;
+            double dispersive_integrand_z(const double & alpha) const;
+            double saturation_p() const;
+            double saturation_z() const;
 
             static std::vector<OptionSpecification>::const_iterator begin_options();
             static std::vector<OptionSpecification>::const_iterator end_options();
