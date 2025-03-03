@@ -75,8 +75,8 @@ namespace eos
         _m_pi(p["mass::pi^-"], *this),
         _t_0(p["0->Kpi::t_0@KSvD2025"], *this),
         _hbar(p["QM::hbar"], *this),
-        n_resonances_1m(o, options, "n-resonances-1m"),
-        n_resonances_0p(o, options, "n-resonances-0p")
+        n_resonances_1m(o, option_specifications, "n-resonances-1m"),
+        n_resonances_0p(o, option_specifications, "n-resonances-0p")
     {
     }
 
@@ -158,18 +158,15 @@ namespace eos
     {
         const std::size_t num_resonances = stoi(n_resonances_1m.value());
 
-        std::vector<double> M(num_resonances);
-        std::copy(_M_fp.cbegin(), _M_fp.cend(), M.begin());
-        std::vector<double> Gamma(num_resonances);
-        std::copy(_G_fp.cbegin(), _G_fp.cend(), Gamma.begin());
+        // factors f in the resonance product, such that result = prod_r f[r]
+        std::vector<complex<double>> f(num_resonances);
 
-        std::vector<complex<double>> f(num_resonances); // such that Pi = prod_r f[r]
-        complex<double> zr;
         for (auto i = 0u; i < num_resonances; i++)
         {
-            zr = this->_zr(M[i], Gamma[i]);
+            complex<double> zr = this->_zr(_M_fp[i], _G_fp[i]);
             f[i] = 1.0 / (z - zr) / (z - std::conj(zr));
         }
+
         return std::accumulate(f.cbegin(), f.cend(), complex<double>(1.0), std::multiplies<complex<double>>());
     }
 
@@ -178,16 +175,11 @@ namespace eos
     {
         const std::size_t num_resonances = stoi(n_resonances_1m.value());
 
-        std::vector<double> M(num_resonances);
-        std::copy(_M_fp.cbegin(), _M_fp.cend(), M.begin());
-        std::vector<double> Gamma(num_resonances);
-        std::copy(_G_fp.cbegin(), _G_fp.cend(), Gamma.begin());
-
-        std::vector<complex<double>> f(num_resonances); // such that Pi = prod_r f[r]
-        complex<double> zr;
+        // factors f in the resonance product, such that result = prod_r f[r]
+        std::vector<complex<double>> f(num_resonances);
         for (auto i = 0u; i < num_resonances; i++)
         {
-            zr = this->_zr(M[i], Gamma[i]);
+            complex<double> zr = this->_zr(_M_fp[i], _G_fp[i]);
             f[i] = 1.0 / (z - zr) / (z - std::conj(zr));
         }
         const auto prod_f = std::accumulate(f.cbegin(), f.cend(), complex<double>(1.0), std::multiplies<complex<double>>());
@@ -195,7 +187,7 @@ namespace eos
         std::vector<complex<double>> fprime(num_resonances); // such that Pi' = prod_r fprime[r]
         for (auto i = 0u; i < num_resonances; i++)
         {
-            zr = this->_zr(M[i], Gamma[i]);
+            complex<double> zr = this->_zr(_M_fp[i], _G_fp[i]);
             fprime[i] =  (-2.0 * (z - zr.real()) / power_of<2>(z - zr) / power_of<2>(z - std::conj(zr)) ) * prod_f / f[i];
         }
         return std::accumulate(fprime.cbegin(), fprime.cend(), complex<double>(0.0));

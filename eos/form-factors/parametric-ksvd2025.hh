@@ -137,7 +137,6 @@ namespace eos
 
             static std::vector<OptionSpecification>::const_iterator begin_options();
             static std::vector<OptionSpecification>::const_iterator end_options();
-            static const std::vector<OptionSpecification> options;
             static const std::vector<OptionSpecification> option_specifications;
 
             static const std::set<ReferenceName> references;
