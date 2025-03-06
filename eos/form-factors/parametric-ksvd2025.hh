@@ -135,6 +135,10 @@ namespace eos
             double saturation_p() const;
             double saturation_z() const;
 
+            /* auxiliary pseudo observables */
+            double b0_fp() const; // value of the series coefficient b_0 for f_+
+            double b0_f0() const; // value of the series coefficient b_0 for f_0
+
             static std::vector<OptionSpecification>::const_iterator begin_options();
             static std::vector<OptionSpecification>::const_iterator end_options();
             static const std::vector<OptionSpecification> option_specifications;

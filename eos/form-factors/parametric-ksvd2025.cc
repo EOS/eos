@@ -139,18 +139,17 @@ namespace eos
         const double t_p      = this->_t_p();
         const double t_0      = this->_t_0();
         const double t_m      = this->_t_m();
-        const double tfactor  = 1.0 - t_0 / t_p;
+        const double t0factor  = 1.0 - t_0 / t_p;
+        const double tmfactor  = 1.0 - t_m / t_p;
         const double Q2       = 1.0;
         const double Q2factor = 1.0 + Q2 / t_p;
         const complex<double> zfactor = (1.0 + z) / (1.0 - z);
 
-        return pow(t_p, -5.0/4.0)
-            / sqrt(32.0 * M_PI * chi_1m)
-            * pow(1.0 - z, -3.0) * pow(1.0 + z, -3.0/2.0) * sqrt(tfactor) * (1.0 + zfactor)
-            * pow( power_of<2>(1.0 + z) * tfactor / power_of<4>(1.0 - z)
-                   * (4.0 * t_p * z + t_m * power_of<2>(1.0 - z) - t_0 * power_of<2>(1.0 + z)), 3.0/4.0)
-            / power_of<2>(zfactor * sqrt(tfactor) + 1.0)
-            / power_of<3>(zfactor * sqrt(tfactor) + sqrt(Q2factor));
+        return (1.0 + zfactor) * pow(t0factor,1.25)
+               * pow(zfactor*sqrt(t0factor) + sqrt(tmfactor), 1.5)
+               / (  pow(1.0 - z,4.5)*power_of<2>(1.0 + zfactor*sqrt(t0factor))
+                  * power_of<3>(sqrt(Q2factor) + zfactor*sqrt(t0factor))
+                  *sqrt(t_p) * sqrt(32 * M_PI * chi_1m) );
     }
 
     complex<double>
@@ -200,35 +199,22 @@ namespace eos
         const double t_p      = this->_t_p();
         const double t_0      = this->_t_0();
         const double t_m      = this->_t_m();
-        const double tfactor  = 1.0 - t_0 / t_p;
+        const double t0factor  = 1.0 - t_0 / t_p;
+        const double tmfactor  = 1.0 - t_m / t_p;
         const double Q2       = 1.0;
         const double Q2factor = 1.0 + Q2 / t_p;
-        const complex<double> zfactor = (1.0 + z) / (1.0 - z);
 
-        return -1.0 *(
-            ( pow(tfactor, 1.5)*sqrt(zfactor) * (
-                sqrt(tfactor) * ( t_0*power_of<2>(1.0 + z)*(5.0 + 6.0*z - 11.0*power_of<2>(z)
-                    + sqrt(tfactor)*(-3.0 + 8.0*z + 11.0*power_of<2>(z)))
-                    - 2*t_p*( 3.0 + z + 21.0*power_of<2>(z) - 25.0*power_of<3>(z)
-                                + sqrt(tfactor)*(3.0 - 9.0*z + 13.0*power_of<2>(z) + 25.0*power_of<3>(z))
-                            )
-                    + t_m * (1.0 - 12.0*z + 11.0*power_of<2>(z) + sqrt(tfactor)*(9.0 - 2.0*z - 11.0*power_of<2>(z)))
-                        * power_of<2>(1.0 - z)
-                    )
-                + sqrt(Q2factor)*(1.0 - z)
-                    * ( t_0*(1.0 + z)*(17.0 - 6.0*z - 11.0*power_of<2>(z)
-                                    + sqrt(tfactor)*(9.0 + 20.0*z + 11.0*power_of<2>(z)))
-                        - 2*t_p*(3.0 + 22.0*z - 25.0*power_of<2>(z) + sqrt(tfactor)*(3.0 + 12.0*z + 25.0*power_of<2>(z)))
-                        - t_m*power_of<2>(1.0 - z)*(sqrt(tfactor)*(3.0 + 11.0*z) + 11.0*(1.0 - z))
-                    )
-               )
-            )
-            / ( t_p*pow(1.0 - z, 3.5) * power_of<3>(1.0 - z + sqrt(tfactor)*(1.0 + z))
-              * power_of<4>(sqrt(tfactor)*(1.0 + z) + sqrt(Q2factor)*(1.0 - z))
-              * pow((tfactor*t_p*power_of<2>(1.0 + z)*(4*t_p*z - t_0*power_of<2>(1.0 + z) + t_m*power_of<2>(1.0 - z)))/power_of<4>(1.0 - z), 0.25)
-              * sqrt(32*M_PI*chi_1m)
-            )
-        );
+        return ( pow(t0factor,1.25)*((-3.0 + 11.0*z)*pow(t0factor,1.5)*power_of<2>(1.0 + z)
+                                      + (-1.0 + 11.0*z)*power_of<2>(-1.0 + z)*sqrt(t0factor)*sqrt(tmfactor)
+                                      - t0factor*(-1.0 + power_of<2>(z))*(5.0 + 11.0*z + (-9.0 + 11.0*z)*sqrt(tmfactor))
+                                      - (-1.0 + z)*sqrt(Q2factor)*(t0factor*(1.0 + z)*(9.0 + 11.0*z) + 11.0*power_of<2>(-1.0 + z)*sqrt(tmfactor)
+                                      - (-1.0 + z)*sqrt(t0factor)*(17.0 + 11.0*z + (3.0 + 11.0*z)*sqrt(tmfactor))))
+                                    *sqrt(-(((1.0 + z)*sqrt(t0factor))/(-1.0 + z)) + sqrt(tmfactor))
+                )
+               / (  pow(1.0 - z,2.5)*power_of<3>(1.0 - z + (1.0 + z)*sqrt(t0factor))
+                  * power_of<4>((-1.0 + z)*sqrt(Q2factor) - (1.0 + z)*sqrt(t0factor))
+                  * sqrt(t_p)*sqrt(32*M_PI*chi_1m)
+            );
     }
 
     complex<double>
@@ -245,18 +231,16 @@ namespace eos
         const double t_p      = this->_t_p();
         const double t_0      = this->_t_0();
         const double t_m      = this->_t_m();
-        const double tfactor  = 1.0 - t_0 / t_p;
+        const double t0factor  = 1.0 - t_0 / t_p;
+        const double tmfactor  = 1.0 - t_m / t_p;
         const double Q2       = 1.0;
         const double Q2factor = 1.0 + Q2 / t_p;
         const complex<double> zfactor = (1.0 + z) / (1.0 - z);
 
-        return pow(t_p, -3.0/4.0) * sqrt(t_m)
-        / sqrt(32.0 * M_PI * chi_0p / 3.0)
-        * pow(1.0-z, -4.0) * pow(1.0+z, -1.0/2.0) * sqrt(tfactor) * (1.0 + zfactor)
-        * pow( power_of<2>(1.0+z) * tfactor / power_of<4>(1.0-z)
-               * (4.0 * t_p * z + t_m * power_of<2>(1.0-z) - t_0 * power_of<2>(1.0+z)), 1.0/4.0)
-        / power_of<2>(zfactor * sqrt(tfactor) + 1.0)
-        / power_of<2>(zfactor * sqrt(tfactor) + sqrt(Q2factor));
+        return ( (1.0 + zfactor)*pow(t0factor, 0.75)*sqrt(t_m)*sqrt(zfactor*sqrt(t0factor) + sqrt(tmfactor)))
+               / (  pow(1.0 - z, 4.5)*power_of<2>(1.0 + zfactor*sqrt(t0factor))
+                  * power_of<2>(sqrt(Q2factor) + zfactor*sqrt(t0factor))
+                  * sqrt(t_p)*sqrt(32*M_PI*chi_0p/3));
     }
 
     complex<double>
@@ -266,26 +250,20 @@ namespace eos
         const double t_p      = this->_t_p();
         const double t_0      = this->_t_0();
         const double t_m      = this->_t_m();
-        const double tfactor  = 1.0 - t_0 / t_p;
+        const double t0factor  = 1.0 - t_0 / t_p;
+        const double tmfactor  = 1.0 - t_m / t_p;
         const double Q2       = 1.0;
         const double Q2factor = 1.0 + Q2 / t_p;
-        const complex<double> zfactor = (1.0 + z) / (1.0 - z);
 
-
-        return (pow(tfactor,1.5)*sqrt(t_m*t_p)*pow(zfactor,1.5)*
-        (sqrt(tfactor)*(-(t_0*power_of<2>(1.0 + z)*(5.0 + 6.0*z - 11.0*power_of<2>(z) +
-                  sqrt(tfactor)*(-3.0 + 8.0*z + 11.0*power_of<2>(z)))) +
-             2*t_p*(1.0 + 7.0*z + 15.0*power_of<2>(z) - 23.0*power_of<3>(z) +
-                sqrt(tfactor)*(1.0 - 7.0*z + 15.0*power_of<2>(z) + 23.0*power_of<3>(z))) +
-             t_m*(3.0 + 8.0*z - 11.0*power_of<2>(z) + sqrt(tfactor)*(-5.0 + 6.0*z + 11.0*power_of<2>(z)))*power_of<2>(1.0 - z)) -
-          sqrt(Q2factor)*(1.0 - z)*(t_0*(1.0 + z)*(13.0 - 2.0*z - 11.0*power_of<2>(z) +
-                sqrt(tfactor)*(5.0 + 16.0*z + 11.0*power_of<2>(z))) -
-             2*t_p*(1.0 + 22.0*z - 23.0*power_of<2>(z) + sqrt(tfactor)*(1.0 + 8.0*z + 23.0*power_of<2>(z))) -
-             t_m*power_of<2>(1.0 - z)*(sqrt(tfactor)*(3.0 + 11.0*z) + 11.0*(1.0 - z)))))/
-      (sqrt(t_p)*pow(1.0 - z,4.5)*pow(1.0 - z + sqrt(tfactor)*(1.0 + z),3)*
-        pow(sqrt(tfactor)*(1.0 + z) + sqrt(Q2factor)*(1.0 - z),3)*
-        pow((tfactor*t_p*power_of<2>(1.0 + z)*(4*t_p*z - t_0*power_of<2>(1.0 + z) + t_m*power_of<2>(1.0 - z)))/power_of<4>(1.0 - z),0.75)*
-        sqrt(32*M_PI*chi_0p/3.));
+        return -( (pow(t0factor,0.75)*sqrt(t_m)*(-((-3.0 + 11.0*z)*pow(t0factor,1.5)*power_of<2>(1.0 + z))
+                                                 - (3.0 + 11.0*z)*power_of<2>(-1.0 + z)*sqrt(t0factor)*sqrt(tmfactor)
+                                                 + t0factor*(-1.0 + power_of<2>(z))*(5.0 + 11.0*z + (-5.0 + 11.0*z)*sqrt(tmfactor))
+                                                 + (-1.0 + z)*sqrt(Q2factor)*(t0factor*(1.0 + z)*(5.0 + 11.0*z)
+                                                 + 11.0*power_of<2>(-1.0 + z)*sqrt(tmfactor) - (-1.0 + z)*sqrt(t0factor)*(13.0 + 11.0*z + (3.0 + 11.0*z)*sqrt(tmfactor))))
+                ))
+                / (  pow(1.0 - z,3.5)*power_of<3>(1.0 - z + (1.0 + z)*sqrt(t0factor))
+                   * power_of<3>(-((-1.0 + z)*sqrt(Q2factor)) + (1.0 + z)*sqrt(t0factor))
+                   * sqrt(t_p)*sqrt(32*M_PI*chi_0p/3)*sqrt(-(((1.0 + z)*sqrt(t0factor))/(-1.0 + z)) + sqrt(tmfactor)));
     }
 
     complex<double>
@@ -293,16 +271,11 @@ namespace eos
     {
         const std::size_t num_resonances = stoi(n_resonances_0p.value());
 
-        std::vector<double> M(num_resonances);
-        std::copy(_M_fz.cbegin(), _M_fz.cend(), M.begin());
-        std::vector<double> Gamma(num_resonances);
-        std::copy(_G_fz.cbegin(), _G_fz.cend(), Gamma.begin());
-
         std::vector<complex<double>> f(num_resonances); // such that Pi = prod_r f[r]
         complex<double> zr;
         for (auto i = 0u; i < num_resonances; i++)
         {
-            zr = this->_zr(M[i], Gamma[i]);
+            complex<double> zr = this->_zr(_M_fz[i], _G_fz[i]);
             f[i] = 1.0 / (z - zr) / (z - std::conj(zr));
         }
         return std::accumulate(f.cbegin(), f.cend(), complex<double>(1.0), std::multiplies<complex<double>>());
@@ -315,10 +288,11 @@ namespace eos
         const complex<double> phitilde_m1 = this->phitilde_p(-1.0, chi_1m);
         const complex<double> phitildeprime_m1 = this->phitildeprime_p(-1.0, chi_1m);
 
-        const complex<double> resonance_productprime = this->resonance_productprime_p(-1.0);
+        const complex<double> resonance_product_m1 = this->resonance_product_p(-1.0);
+        const complex<double> resonance_productprime_m1 = this->resonance_productprime_p(-1.0);
 
-        const complex<double> X = phitilde_m1;
-        const complex<double> Xprime = -1.0*phitildeprime_m1 / power_of<2>(phitilde_m1) + resonance_productprime / phitilde_m1;
+        const complex<double> X = resonance_product_m1 / phitilde_m1;
+        const complex<double> Xprime = -resonance_product_m1*phitildeprime_m1 / power_of<2>(phitilde_m1) + resonance_productprime_m1 / phitilde_m1;
 
         std::array<double, 9> bp;
         std::copy(_b_fp.cbegin(), _b_fp.cend(), bp.begin());
@@ -326,7 +300,7 @@ namespace eos
         std::array<complex<double>, bp.size()> c;
         for (auto n = 0u; n < c.size(); n++)
         {
-            c[n] = pow(-1, n) * (-1.0*n * X + Xprime);
+            c[n] = pow(-1, n+1) * (-1.0*(n+1) * X + Xprime); //  n+1 because we want to sum starting at 1
         }
         // Is there a way to write this in manifestly real form?
         const double b0 = std::real( -1.0 / Xprime
@@ -351,14 +325,14 @@ namespace eos
         const complex<double> bp_sum = this->series_m(z0, bp);
         const complex<double> b0_sum = this->series_m(z0, bz);
 
-        const auto Pi_p = this->resonance_product_p(z0);
-        const auto Pi_z = this->resonance_product_z(z0);
+        const auto Pi_p_z0 = this->resonance_product_p(z0);
+        const auto Pi_z_z0 = this->resonance_product_z(z0);
 
         const auto phitilde_p_z0 = this->phitilde_p(z0, chi_1m);
         const auto phitilde_z_z0 = this->phitilde_z(z0, chi_0p);
 
         // Is there a way to write this in manifestly real form?
-        const double b0 = std::real( (phitilde_z_z0 / phitilde_p_z0) * (Pi_p / Pi_z) * bp_sum - b0_sum );
+        const double b0 = std::real( (phitilde_z_z0 / phitilde_p_z0) * (Pi_p_z0 / Pi_z_z0) * bp_sum - b0_sum );
         return b0;
     }
 
@@ -408,7 +382,7 @@ namespace eos
 
         // prepare expansion coefficients
         std::array<double, 10> bz;
-        std::copy(_b_fp.cbegin(), _b_fp.cend(), bz.begin()+1);
+        std::copy(_b_fz.cbegin(), _b_fz.cend(), bz.begin()+1);
         // Fix b[0] to enforce f_0(0) = f_+(0)
         bz[0] = _b0_fz(chi_1m, chi_0p);
 
@@ -462,8 +436,8 @@ namespace eos
         const complex<double> z = std::polar(1.0, alpha);
         const complex<double> w = this->w_z(z);
 
-        const auto chi_1m = 1.0; // TODO
-        const auto chi_0p = 1.0; // TODO
+        const auto chi_1m = 0.5; // TODO
+        const auto chi_0p = 0.3; // TODO
 
         const auto resonance_product = this->resonance_product_z(z);
 
@@ -482,6 +456,19 @@ namespace eos
     {
         std::function<double (const double &)> f = [this](const double & alpha) -> double { return this->dispersive_integrand_z(alpha); };
         return integrate<GSL::QAGS>(f, -M_PI, M_PI) / (2.0 * M_PI);
+    }
+
+    double KSvD2025FormFactors<VacuumToKPi>::b0_fp() const
+    {
+        const auto chi_1m = 0.5; // TODO
+        return _b0_fp(chi_1m);
+    }
+
+    double KSvD2025FormFactors<VacuumToKPi>::b0_f0() const
+    {
+        const auto chi_1m = 0.5; // TODO
+        const auto chi_0p = 0.3; // TODO
+        return _b0_fz(chi_1m, chi_0p);
     }
 
     const std::set<ReferenceName>

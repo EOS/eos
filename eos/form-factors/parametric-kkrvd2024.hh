@@ -112,7 +112,7 @@ namespace eos
 
             /* auxiliary pseudo observables */
             double b_0() const; // value of the series coefficient b_0
-            double b_1() const; // value of the series coefficient b_0
+            double b_1() const; // value of the series coefficient b_1
             complex<double> residue_rho() const; // complex-valued residue of the form factor on the rho pole
             double re_residue_rho() const;
             double im_residue_rho() const;
