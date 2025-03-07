@@ -139,8 +139,8 @@ namespace eos
         const double t_p      = this->_t_p();
         const double t_0      = this->_t_0();
         const double t_m      = this->_t_m();
-        const double t0factor  = 1.0 - t_0 / t_p;
-        const double tmfactor  = 1.0 - t_m / t_p;
+        const double t0factor = 1.0 - t_0 / t_p;
+        const double tmfactor = 1.0 - t_m / t_p;
         const double Q2       = 1.0;
         const double Q2factor = 1.0 + Q2 / t_p;
         const complex<double> zfactor = (1.0 + z) / (1.0 - z);
@@ -199,8 +199,8 @@ namespace eos
         const double t_p      = this->_t_p();
         const double t_0      = this->_t_0();
         const double t_m      = this->_t_m();
-        const double t0factor  = 1.0 - t_0 / t_p;
-        const double tmfactor  = 1.0 - t_m / t_p;
+        const double t0factor = 1.0 - t_0 / t_p;
+        const double tmfactor = 1.0 - t_m / t_p;
         const double Q2       = 1.0;
         const double Q2factor = 1.0 + Q2 / t_p;
 
@@ -231,8 +231,8 @@ namespace eos
         const double t_p      = this->_t_p();
         const double t_0      = this->_t_0();
         const double t_m      = this->_t_m();
-        const double t0factor  = 1.0 - t_0 / t_p;
-        const double tmfactor  = 1.0 - t_m / t_p;
+        const double t0factor = 1.0 - t_0 / t_p;
+        const double tmfactor = 1.0 - t_m / t_p;
         const double Q2       = 1.0;
         const double Q2factor = 1.0 + Q2 / t_p;
         const complex<double> zfactor = (1.0 + z) / (1.0 - z);
@@ -250,8 +250,8 @@ namespace eos
         const double t_p      = this->_t_p();
         const double t_0      = this->_t_0();
         const double t_m      = this->_t_m();
-        const double t0factor  = 1.0 - t_0 / t_p;
-        const double tmfactor  = 1.0 - t_m / t_p;
+        const double t0factor = 1.0 - t_0 / t_p;
+        const double tmfactor = 1.0 - t_m / t_p;
         const double Q2       = 1.0;
         const double Q2factor = 1.0 + Q2 / t_p;
 
