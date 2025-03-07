@@ -59,12 +59,12 @@ class ParametricKSvD2025Test :
                  // K0*(1430)
                 // p["0->Kpi::M_(0,1)@KSvD2025"]     =  1.431;
                 // p["0->Kpi::Gamma_(0,1)@KSvD2025"] =  0.110;
-                p["0->Kpi::b_+^1@KSvD2025"]   =  0.5;
-                p["0->Kpi::b_+^2@KSvD2025"]   =  0.1;
-                p["0->Kpi::b_+^3@KSvD2025"]   =  0.05;
-                p["0->Kpi::b_0^1@KSvD2025"]   =  0.3;
-                p["0->Kpi::b_0^2@KSvD2025"]   =  0.08;
-                p["0->Kpi::b_0^3@KSvD2025"]   =  0.01;
+                p["0->Kpi::b_+^1@KSvD2025"]   =  0.1;
+                p["0->Kpi::b_+^2@KSvD2025"]   =  0.05;
+                p["0->Kpi::b_+^3@KSvD2025"]   =  0.01;
+                p["0->Kpi::b_0^1@KSvD2025"]   =  0.07;
+                p["0->Kpi::b_0^2@KSvD2025"]   =  0.03;
+                p["0->Kpi::b_0^3@KSvD2025"]   =  0.009;
 
                 /* 0->PP factory */
                 {
@@ -93,21 +93,21 @@ class ParametricKSvD2025Test :
                 {
                     KSvD2025FormFactors<VacuumToKPi> ff(p, Options{ });
 
-                    const auto chi_1m = 0.5;
+                    const auto chi_1m = 3.446e-3;
 
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_p(ff.z( 0.0), chi_1m)),  0.0129766667,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_p(ff.z( 0.0), chi_1m)),  0.0462214083,  eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_p(ff.z( 0.0), chi_1m)),  0.0,           eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_p(ff.z(+0.1), chi_1m)),  0.0118136429,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_p(ff.z(+0.1), chi_1m)),  0.0401071876,  eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_p(ff.z(+0.1), chi_1m)),  0.0,           eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_p(ff.z(+0.5), chi_1m)),  0.00511197788,  eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_p(ff.z(+0.5), chi_1m)), -0.00296703547,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_p(ff.z(+0.5), chi_1m)),  0.00904454996, eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_p(ff.z(+0.5), chi_1m)), -0.01029258129, eps);
 
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_p(ff.z( 0.0), chi_1m)),  0.0198271348,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_p(ff.z( 0.0), chi_1m)),  0.106199235,  eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_p(ff.z( 0.0), chi_1m)),  0.0,          eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_p(ff.z(+0.1), chi_1m)),  0.0172636701,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_p(ff.z(+0.1), chi_1m)),  0.0889911105, eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_p(ff.z(+0.1), chi_1m)),  0.0,          eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_p(ff.z(+0.5), chi_1m)),  0.00465459238, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_p(ff.z(+0.5), chi_1m)), -0.00398567803, eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_p(ff.z(+0.5), chi_1m)),  0.0125456956, eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_p(ff.z(+0.5), chi_1m)), -0.0196693995, eps);
 
                     TEST_CHECK_NEARLY_EQUAL(real(ff.resonance_product_p(ff.z( 0.0))),  1.04722073,  eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.resonance_product_p(ff.z( 0.0))),  0.0,         eps);
@@ -123,35 +123,35 @@ class ParametricKSvD2025Test :
                     TEST_CHECK_NEARLY_EQUAL(real(ff.resonance_productprime_p(ff.z( 0.5))),  1.95390159,   eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.resonance_productprime_p(ff.z( 0.5))), -1.30168386,   eps);
 
-                    TEST_CHECK_NEARLY_EQUAL(ff.b0_fp(), -0.0999435, eps);
+                    TEST_CHECK_NEARLY_EQUAL(ff.b0_fp(), -0.121144607, eps);
 
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_p(0.0)), -19.5870533, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.f_p(0.0)),   0.0,       eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_p(0.1)), -24.1282649, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.f_p(0.1)),   0.0,       eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_p(0.5)), -75.5346359, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.f_p(0.5)),   1.3358251, eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_p(0.0)), -3.33011297,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.f_p(0.0)),  0.0,         eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_p(0.1)), -3.97007786,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.f_p(0.1)),  0.0,         eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_p(0.5)), -11.28826275, eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.f_p(0.5)),  0.10003175,  eps);
                 }
 
                 /* f_0 at timelike q2 > 0.0 */
                 {
                     KSvD2025FormFactors<VacuumToKPi> ff(p, Options{ {"n-resonances-0p", "1"} });
 
-                    const auto chi_0p = 0.3;
+                    const auto chi_0p = 6e-5;
 
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_z(ff.z( 0.0), chi_0p)),  0.00874124234, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_z(ff.z( 0.0), chi_0p)),  0.0,           eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_z(ff.z(+0.1), chi_0p)),  0.00818142811, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_z(ff.z(+0.1), chi_0p)),  0.0,           eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_z(ff.z(+0.5), chi_0p)),  0.00494611070, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_z(ff.z(+0.5), chi_0p)), -0.00127383276, eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_z(ff.z( 0.0), chi_0p)),  0.274342612,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_z(ff.z( 0.0), chi_0p)),  0.0,          eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_z(ff.z(+0.1), chi_0p)),  0.248687978,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_z(ff.z(+0.1), chi_0p)),  0.0,          eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitilde_z(ff.z(+0.5), chi_0p)),  0.1074383665, eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitilde_z(ff.z(+0.5), chi_0p)), -0.0543100988, eps);
 
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_z(ff.z( 0.0), chi_0p)),  0.00955439874, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_z(ff.z( 0.0), chi_0p)),  0.0,           eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_z(ff.z(+0.1), chi_0p)),  0.00829786553, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_z(ff.z(+0.1), chi_0p)),  0.0,           eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_z(ff.z(+0.5), chi_0p)),  0.00195495683, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_z(ff.z(+0.5), chi_0p)), -0.00229014562, eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_z(ff.z( 0.0), chi_0p)),  0.440640206,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_z(ff.z( 0.0), chi_0p)),  0.0,          eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_z(ff.z(+0.1), chi_0p)),  0.377814489,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_z(ff.z(+0.1), chi_0p)),  0.0,          eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.phitildeprime_z(ff.z(+0.5), chi_0p)),  0.0783363955, eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.phitildeprime_z(ff.z(+0.5), chi_0p)), -0.0917596853, eps);
 
                     TEST_CHECK_NEARLY_EQUAL(real(ff.resonance_product_z(ff.z( 0.0))),  0.547815118, eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.resonance_product_z(ff.z( 0.0))),  0.0,         eps);
@@ -160,14 +160,14 @@ class ParametricKSvD2025Test :
                     TEST_CHECK_NEARLY_EQUAL(real(ff.resonance_product_z(ff.z( 0.5))),  1.004483094, eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.resonance_product_z(ff.z( 0.5))),  0.556192495, eps);
 
-                    TEST_CHECK_NEARLY_EQUAL(ff.b0_f0(), -0.229236, eps);
+                    TEST_CHECK_NEARLY_EQUAL(ff.b0_f0(), -1.64910772, eps);
 
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_0(0.0)), -19.5870533, eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_0(0.0)), -3.33011297, eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.f_0(0.0)),   0.0,       eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_0(0.1)), -23.5662156, eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_0(0.1)), -3.94663863, eps);
                     TEST_CHECK_NEARLY_EQUAL(imag(ff.f_0(0.1)),   0.0,       eps);
-                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_0(0.5)), -59.9125015, eps);
-                    TEST_CHECK_NEARLY_EQUAL(imag(ff.f_0(0.5)), -83.7890488, eps);
+                    TEST_CHECK_NEARLY_EQUAL(real(ff.f_0(0.5)), -8.9506655,  eps);
+                    TEST_CHECK_NEARLY_EQUAL(imag(ff.f_0(0.5)),-13.4622631,  eps);
                 }
             }
         }
